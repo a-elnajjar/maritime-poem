@@ -396,6 +396,199 @@
     .verse { font-size: 1.35rem; line-height: 2; }
     .stanza { margin-bottom: 5rem; }
   }
+
+  /* ============ INTERACTIVITY ============ */
+
+  /* custom cursor — a small compass/star */
+  body {
+    cursor: none;
+  }
+  @media (max-width: 768px) {
+    body { cursor: auto; }
+    .cursor, .cursor-trail { display: none !important; }
+  }
+
+  .cursor {
+    position: fixed;
+    top: 0; left: 0;
+    width: 24px;
+    height: 24px;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease-out, width 0.3s ease, height 0.3s ease;
+    mix-blend-mode: screen;
+  }
+
+  .cursor svg {
+    width: 100%;
+    height: 100%;
+    animation: cursorSpin 8s linear infinite;
+  }
+
+  .cursor.hover {
+    width: 50px;
+    height: 50px;
+  }
+
+  .cursor.hover svg {
+    animation-duration: 3s;
+  }
+
+  @keyframes cursorSpin {
+    to { transform: rotate(360deg); }
+  }
+
+  .cursor-trail {
+    position: fixed;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--turquoise);
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    opacity: 0.8;
+    animation: trailFade 1.2s ease-out forwards;
+  }
+
+  @keyframes trailFade {
+    to {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(3);
+    }
+  }
+
+  /* click ripple — concentric circles like a stone in water */
+  .ripple {
+    position: fixed;
+    border: 1px solid var(--turquoise);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9997;
+    transform: translate(-50%, -50%);
+    animation: rippleOut 1.4s ease-out forwards;
+  }
+
+  @keyframes rippleOut {
+    0% {
+      width: 0; height: 0;
+      opacity: 0.8;
+      border-width: 2px;
+    }
+    100% {
+      width: 250px; height: 250px;
+      opacity: 0;
+      border-width: 0.5px;
+    }
+  }
+
+  /* constellation canvas */
+  #constellation {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0.6;
+  }
+
+  /* sound toggle */
+  .sound-toggle {
+    position: fixed;
+    top: 2rem;
+    left: 2rem;
+    z-index: 100;
+    background: rgba(10, 22, 40, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(201, 168, 97, 0.3);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: none;
+    color: var(--gold);
+    transition: all 0.3s ease;
+    opacity: 0;
+    animation: fadeIn 2s 3s ease forwards;
+  }
+
+  .sound-toggle:hover {
+    background: rgba(201, 168, 97, 0.15);
+    transform: scale(1.1);
+  }
+
+  .sound-toggle svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .sound-toggle .wave-anim {
+    display: none;
+  }
+
+  .sound-toggle.playing .wave-anim {
+    display: inline;
+    animation: soundWave 1.2s ease-in-out infinite;
+    transform-origin: center;
+  }
+
+  .sound-toggle.playing .wave-anim.w2 {
+    animation-delay: 0.2s;
+  }
+
+  .sound-toggle.playing .wave-anim.w3 {
+    animation-delay: 0.4s;
+  }
+
+  @keyframes soundWave {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+
+  /* line hover — gentle tilt + glow */
+  .verse .line {
+    display: block;
+    position: relative;
+    padding-right: 1rem;
+    transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    cursor: none;
+  }
+
+  .verse .line:hover {
+    color: var(--turquoise);
+    padding-right: 1.8rem;
+    text-shadow: 0 0 20px rgba(95, 184, 184, 0.5);
+    transform: translateX(-8px);
+    letter-spacing: 0.02em;
+  }
+
+  /* line reveal marker — a small drop that appears on hover */
+  .verse .line::before {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--turquoise);
+    transform: translateY(-50%) scale(0);
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    box-shadow: 0 0 12px var(--turquoise);
+  }
+
+  .verse .line:hover::before {
+    transform: translateY(-50%) scale(1);
+  }
+
+  /* remove padding override from refrain.big */
+  .verse .refrain.big:hover {
+    padding-right: 0;
+    transform: none;
+  }
 </style>
 </head>
 <body>
@@ -403,6 +596,30 @@
 <div class="sea"></div>
 <div class="glow a"></div>
 <div class="glow b"></div>
+
+<!-- constellation canvas — "أصيد ملايين الأقمار" -->
+<canvas id="constellation"></canvas>
+
+<!-- custom compass cursor -->
+<div class="cursor" id="cursor">
+  <svg viewBox="0 0 24 24" fill="none">
+    <circle cx="12" cy="12" r="11" stroke="#c9a861" stroke-width="0.6" opacity="0.6"/>
+    <circle cx="12" cy="12" r="6" stroke="#5fb8b8" stroke-width="0.5" opacity="0.8"/>
+    <path d="M12 2 L13 12 L12 22 L11 12 Z" fill="#c9a861" opacity="0.9"/>
+    <path d="M2 12 L12 11 L22 12 L12 13 Z" fill="#5fb8b8" opacity="0.7"/>
+    <circle cx="12" cy="12" r="1.2" fill="#f2ebdc"/>
+  </svg>
+</div>
+
+<!-- sound toggle -->
+<button class="sound-toggle" id="soundToggle" aria-label="تشغيل/إيقاف صوت البحر">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M11 5 L6 9 H2 V15 H6 L11 19 Z"/>
+    <path class="wave-anim w1" d="M15.5 8.5 Q 17 12, 15.5 15.5" stroke-width="1.2"/>
+    <path class="wave-anim w2" d="M18 6 Q 21 12, 18 18" stroke-width="1.2"/>
+    <path class="wave-anim w3" d="M20.5 3.5 Q 25 12, 20.5 20.5" stroke-width="1.2"/>
+  </svg>
+</button>
 
 <!-- falling light -->
 <div class="rain" id="rain"></div>
@@ -580,7 +797,7 @@
 </footer>
 
 <script>
-  // generate falling light
+  // ============ FALLING LIGHT ============
   const rain = document.getElementById('rain');
   for (let i = 0; i < 60; i++) {
     const drop = document.createElement('span');
@@ -595,7 +812,7 @@
     rain.appendChild(drop);
   }
 
-  // reveal stanzas on scroll
+  // ============ STANZA REVEAL ON SCROLL ============
   const io = new IntersectionObserver((entries) => {
     entries.forEach(e => {
       if (e.isIntersecting) {
@@ -603,8 +820,202 @@
       }
     });
   }, { threshold: 0.2 });
-
   document.querySelectorAll('[data-stanza]').forEach(el => io.observe(el));
+
+  // ============ CUSTOM CURSOR + TRAIL ============
+  const cursor = document.getElementById('cursor');
+  let mouseX = window.innerWidth / 2;
+  let mouseY = window.innerHeight / 2;
+  let lastTrailTime = 0;
+
+  document.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    cursor.style.left = mouseX + 'px';
+    cursor.style.top = mouseY + 'px';
+
+    // sparse trail — one drop every 60ms max
+    const now = Date.now();
+    if (now - lastTrailTime > 60) {
+      lastTrailTime = now;
+      const trail = document.createElement('div');
+      trail.className = 'cursor-trail';
+      trail.style.left = mouseX + 'px';
+      trail.style.top = mouseY + 'px';
+      trail.style.background = Math.random() > 0.5 ? '#5fb8b8' : '#c9a861';
+      document.body.appendChild(trail);
+      setTimeout(() => trail.remove(), 1200);
+    }
+  });
+
+  // cursor grows on interactive elements
+  document.querySelectorAll('.line, .sound-toggle').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+  });
+
+  // ============ CLICK RIPPLE ============
+  document.addEventListener('click', (e) => {
+    // don't ripple on the sound toggle
+    if (e.target.closest('.sound-toggle')) return;
+
+    const ripple = document.createElement('div');
+    ripple.className = 'ripple';
+    ripple.style.left = e.clientX + 'px';
+    ripple.style.top = e.clientY + 'px';
+    document.body.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 1400);
+
+    // second, slower ripple for depth
+    setTimeout(() => {
+      const r2 = document.createElement('div');
+      r2.className = 'ripple';
+      r2.style.left = e.clientX + 'px';
+      r2.style.top = e.clientY + 'px';
+      r2.style.animationDuration = '2s';
+      document.body.appendChild(r2);
+      setTimeout(() => r2.remove(), 2000);
+    }, 200);
+  });
+
+  // ============ CONSTELLATION ============
+  // "وأصيدُ ملايينَ الأقمار" — mouse leaves behind stars that connect
+  const canvas = document.getElementById('constellation');
+  const ctx = canvas.getContext('2d');
+  let stars = [];
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  document.addEventListener('mousemove', (e) => {
+    // add stars sparingly
+    if (Math.random() > 0.85) {
+      stars.push({
+        x: e.clientX + (Math.random() - 0.5) * 40,
+        y: e.clientY + (Math.random() - 0.5) * 40,
+        r: 0.5 + Math.random() * 1.5,
+        life: 1,
+        twinkle: Math.random() * Math.PI * 2
+      });
+    }
+    // cap at 80 stars to keep it light
+    if (stars.length > 80) stars.shift();
+  });
+
+  function drawConstellation() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // draw stars
+    stars.forEach(s => {
+      s.life -= 0.003;
+      s.twinkle += 0.05;
+      const alpha = Math.max(0, s.life) * (0.6 + Math.sin(s.twinkle) * 0.4);
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(232, 223, 208, ${alpha})`;
+      ctx.fill();
+
+      // glow halo
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r * 3, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(201, 168, 97, ${alpha * 0.15})`;
+      ctx.fill();
+    });
+
+    // connect close stars with thin lines
+    for (let i = 0; i < stars.length; i++) {
+      for (let j = i + 1; j < stars.length; j++) {
+        const a = stars[i], b = stars[j];
+        const dx = a.x - b.x, dy = a.y - b.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 120) {
+          const alpha = (1 - dist / 120) * Math.min(a.life, b.life) * 0.25;
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.strokeStyle = `rgba(95, 184, 184, ${alpha})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+
+    // remove dead stars
+    stars = stars.filter(s => s.life > 0);
+    requestAnimationFrame(drawConstellation);
+  }
+  drawConstellation();
+
+  // ============ AMBIENT SEA SOUND (synthesized, no files) ============
+  const soundBtn = document.getElementById('soundToggle');
+  let audioCtx = null;
+  let seaNodes = null;
+  let playing = false;
+
+  function createSeaSound() {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+    // gentle white noise → filtered = wave sound
+    const bufferSize = 2 * ctx.sampleRate;
+    const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      output[i] = Math.random() * 2 - 1;
+    }
+
+    const noise = ctx.createBufferSource();
+    noise.buffer = noiseBuffer;
+    noise.loop = true;
+
+    // band-pass filter to make it sound like waves (not static)
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 400;
+    filter.Q.value = 0.5;
+
+    // slow LFO modulates filter cutoff = rolling wave sensation
+    const lfo = ctx.createOscillator();
+    lfo.frequency.value = 0.12; // very slow
+    const lfoGain = ctx.createGain();
+    lfoGain.gain.value = 250;
+    lfo.connect(lfoGain);
+    lfoGain.connect(filter.frequency);
+
+    // main gain — fade in softly
+    const gain = ctx.createGain();
+    gain.gain.value = 0;
+    gain.gain.linearRampToValueAtTime(0.18, ctx.currentTime + 2);
+
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+
+    noise.start();
+    lfo.start();
+
+    return { ctx, gain, noise, lfo };
+  }
+
+  soundBtn.addEventListener('click', () => {
+    if (!playing) {
+      if (!seaNodes) seaNodes = createSeaSound();
+      else {
+        seaNodes.gain.gain.cancelScheduledValues(seaNodes.ctx.currentTime);
+        seaNodes.gain.gain.linearRampToValueAtTime(0.18, seaNodes.ctx.currentTime + 1.5);
+      }
+      soundBtn.classList.add('playing');
+      playing = true;
+    } else {
+      seaNodes.gain.gain.cancelScheduledValues(seaNodes.ctx.currentTime);
+      seaNodes.gain.gain.linearRampToValueAtTime(0, seaNodes.ctx.currentTime + 1);
+      soundBtn.classList.remove('playing');
+      playing = false;
+    }
+  });
 </script>
 
 </body>
