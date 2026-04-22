@@ -589,6 +589,151 @@
     padding-right: 0;
     transform: none;
   }
+
+  /* ============ LANGUAGE TOGGLE ============ */
+  .lang-toggle {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    z-index: 100;
+    background: rgba(10, 22, 40, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(201, 168, 97, 0.3);
+    border-radius: 40px;
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    cursor: none;
+    opacity: 0;
+    animation: fadeIn 2s 3s ease forwards;
+    font-family: 'Marcellus', serif;
+  }
+
+  .lang-toggle button {
+    background: none;
+    border: none;
+    color: var(--mist);
+    font-family: 'Marcellus', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    padding: 8px 16px;
+    border-radius: 30px;
+    cursor: none;
+    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    position: relative;
+    z-index: 2;
+  }
+
+  .lang-toggle button.ar {
+    font-family: 'Amiri', serif;
+    font-size: 0.95rem;
+    letter-spacing: 0;
+  }
+
+  .lang-toggle .slider {
+    position: absolute;
+    top: 6px;
+    bottom: 6px;
+    background: linear-gradient(135deg, var(--gold), #b8934d);
+    border-radius: 30px;
+    transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    box-shadow: 0 2px 12px rgba(201, 168, 97, 0.3);
+    z-index: 1;
+  }
+
+  .lang-toggle.ar .slider {
+    right: 6px;
+    left: 50%;
+  }
+
+  .lang-toggle.en .slider {
+    right: 50%;
+    left: 6px;
+  }
+
+  .lang-toggle button.active {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  /* Adjust sound toggle position so it doesn't collide */
+  .sound-toggle {
+    top: 2rem;
+    left: 2rem;
+  }
+
+  /* ============ BILINGUAL CONTENT ============ */
+  /* English body uses a different font family */
+  body.en-mode {
+    font-family: 'Cormorant Garamond', serif;
+  }
+
+  body.en-mode .verse {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    text-align: left;
+    direction: ltr;
+  }
+
+  body.en-mode .verse .line {
+    padding-right: 0;
+    padding-left: 1rem;
+  }
+
+  body.en-mode .verse .line:hover {
+    padding-right: 0;
+    padding-left: 1.8rem;
+    transform: translateX(8px);
+  }
+
+  body.en-mode .verse .line::before {
+    right: auto;
+    left: 0;
+  }
+
+  body.en-mode .stanza-num::before {
+    /* flip the leading line */
+  }
+
+  body.en-mode .byline,
+  body.en-mode .title,
+  body.en-mode .verse .refrain.big,
+  body.en-mode .signature {
+    font-family: 'Cormorant Garamond', serif;
+  }
+
+  body.en-mode .eyebrow,
+  body.en-mode .ornament,
+  body.en-mode .footer .meta {
+    /* keep as is */
+  }
+
+  /* content visibility */
+  .ar-content { display: block; }
+  .en-content { display: none; }
+
+  body.en-mode {
+    direction: ltr;
+  }
+  body.en-mode .ar-content { display: none; }
+  body.en-mode .en-content { display: block; }
+
+  body.en-mode .stanza-num {
+    font-family: 'Marcellus', serif;
+  }
+
+  /* Smooth fade when switching */
+  .poem, .stage, .footer {
+    transition: opacity 0.3s ease;
+  }
+
+  body.switching .poem,
+  body.switching .stage,
+  body.switching .footer {
+    opacity: 0;
+  }
 </style>
 </head>
 <body>
@@ -621,6 +766,13 @@
   </svg>
 </button>
 
+<!-- language toggle -->
+<div class="lang-toggle ar" id="langToggle">
+  <div class="slider"></div>
+  <button class="en" data-lang="en">EN</button>
+  <button class="ar active" data-lang="ar">ع</button>
+</div>
+
 <!-- falling light -->
 <div class="rain" id="rain"></div>
 
@@ -649,15 +801,19 @@
     <div class="line"></div>
   </div>
 
-  <div class="eyebrow">نزار قباني · 1923—1998</div>
+  <div class="eyebrow ar-content">نزار قباني · 1923—1998</div>
+  <div class="eyebrow en-content">Nizar Qabbani · 1923—1998</div>
 
   <h1 class="title">
-    <span class="word">القصيدةُ البحريّة</span>
+    <span class="word ar-content">القصيدةُ البحريّة</span>
+    <span class="word en-content">Maritime Poem</span>
   </h1>
 
-  <p class="byline">في مرفأ عينيكِ الأزرق</p>
+  <p class="byline ar-content">في مرفأ عينيكِ الأزرق</p>
+  <p class="byline en-content"><em>In the blue harbor of your eyes</em></p>
 
-  <div class="scroll-cue">اقرأ</div>
+  <div class="scroll-cue ar-content">اقرأ</div>
+  <div class="scroll-cue en-content">READ</div>
 </section>
 
 <!-- POEM -->
@@ -666,7 +822,8 @@
   <!-- Opening refrain -->
   <div class="stanza opening" data-stanza>
     <div class="verse">
-      <span class="line refrain big">في مرفأ عينيكِ الأزرق</span>
+      <span class="line refrain big ar-content">في مرفأ عينيكِ الأزرق</span>
+      <span class="line refrain big en-content">In the blue harbor of your eyes</span>
     </div>
   </div>
 
@@ -679,11 +836,17 @@
   <!-- STANZA I -->
   <div class="stanza" data-stanza>
     <div class="stanza-num">I</div>
-    <div class="verse">
+    <div class="verse ar-content">
       <span class="line">أمطارٌ من ضوءٍ مسموع</span>
       <span class="line">وشموسٌ دائخةٌ.. وقلوع</span>
       <span class="line accent">ترسم رحلتها للمطلق</span>
       <span class="line refrain">في مرفأ عينيكِ الأزرق</span>
+    </div>
+    <div class="verse en-content">
+      <span class="line">Blow rains of melodious lights,</span>
+      <span class="line">Dizzy suns and sails</span>
+      <span class="line accent">Painting their voyage to endlessness.</span>
+      <span class="line refrain">In the blue harbor of your eyes</span>
     </div>
   </div>
 
@@ -696,11 +859,17 @@
   <!-- STANZA II -->
   <div class="stanza" data-stanza>
     <div class="stanza-num">II</div>
-    <div class="verse">
+    <div class="verse ar-content">
       <span class="line">شبّاكٌ بحريٌّ مفتوح</span>
       <span class="line">وطيورٌ في الأبعاد تلوح</span>
       <span class="line accent">تبحثُ عن جُزُرٍ لم تُخلَق..</span>
       <span class="line refrain">في مرفأ عينيكِ الأزرق..</span>
+    </div>
+    <div class="verse en-content">
+      <span class="line">Is an open sea window,</span>
+      <span class="line">And birds appear in the distance</span>
+      <span class="line accent">Searching for islands still unborn.</span>
+      <span class="line refrain">In the blue harbor of your eyes</span>
     </div>
   </div>
 
@@ -713,11 +882,17 @@
   <!-- STANZA III -->
   <div class="stanza" data-stanza>
     <div class="stanza-num">III</div>
-    <div class="verse">
+    <div class="verse ar-content">
       <span class="line">يتساقطُ ثلجٌ في تمّوز</span>
       <span class="line">ومراكبُ حُبلى بالفيروز</span>
       <span class="line accent">أغرقتِ البحرَ ولم تغرق..</span>
       <span class="line refrain">في مرفأ عينيكِ الأزرق</span>
+    </div>
+    <div class="verse en-content">
+      <span class="line">Snow falls in July.</span>
+      <span class="line">Ships laden with turquoise</span>
+      <span class="line accent">Spill over the sea and are not drowned.</span>
+      <span class="line refrain">In the blue harbor of your eyes</span>
     </div>
   </div>
 
@@ -730,11 +905,17 @@
   <!-- STANZA IV -->
   <div class="stanza" data-stanza>
     <div class="stanza-num">IV</div>
-    <div class="verse">
+    <div class="verse ar-content">
       <span class="line">أركضُ كالطفلِ على الصخر</span>
       <span class="line">أستنشقُ رائحةَ البحر..</span>
       <span class="line accent">وأعودُ كعصفورٍ مُرهَق..</span>
       <span class="line refrain">في مرفأ عينيكِ الأزرق..</span>
+    </div>
+    <div class="verse en-content">
+      <span class="line">I run on the scattered rocks like a child</span>
+      <span class="line">Breathing the fragrance of the sea</span>
+      <span class="line accent">And return an exhausted bird.</span>
+      <span class="line refrain">In the blue harbor of your eyes</span>
     </div>
   </div>
 
@@ -747,11 +928,17 @@
   <!-- STANZA V -->
   <div class="stanza" data-stanza>
     <div class="stanza-num">V</div>
-    <div class="verse">
+    <div class="verse ar-content">
       <span class="line">أحلمُ بالبحرِ وبالإبحار</span>
       <span class="line">وأصيدُ ملايينَ الأقمار</span>
       <span class="line accent">وعقودَ اللؤلؤِ والزنبق</span>
       <span class="line refrain">في مرفأ عينيكِ الأزرق</span>
+    </div>
+    <div class="verse en-content">
+      <span class="line">I dream of the sea and of voyages,</span>
+      <span class="line">I hunt millions of moons,</span>
+      <span class="line accent">Necklaces of pearls and lilies</span>
+      <span class="line refrain">In the blue harbor of your eyes</span>
     </div>
   </div>
 
@@ -764,11 +951,17 @@
   <!-- STANZA VI -->
   <div class="stanza" data-stanza>
     <div class="stanza-num">VI</div>
-    <div class="verse">
+    <div class="verse ar-content">
       <span class="line">تتكلّمُ في الليلِ الأحجار..</span>
       <span class="line">في دفترِ عينيكِ المُغلَق</span>
       <span class="line accent">من خبّأ آلافَ الأشعار؟</span>
       <span class="line refrain">في مرفأ عينيكِ الأزرق</span>
+    </div>
+    <div class="verse en-content">
+      <span class="line">Stones sing in the night.</span>
+      <span class="line">Who has hidden a thousand poems</span>
+      <span class="line accent">In the closed book of your eyes?</span>
+      <span class="line refrain">In the blue harbor of your eyes</span>
     </div>
   </div>
 
@@ -780,20 +973,29 @@
 
   <!-- STANZA VII — final -->
   <div class="stanza final" data-stanza>
-    <div class="stanza-num">VII · الخاتمة</div>
-    <div class="verse">
+    <div class="stanza-num ar-content">VII · الخاتمة</div>
+    <div class="stanza-num en-content">VII · Envoi</div>
+    <div class="verse ar-content">
       <span class="line">لو أنّي.. لو أنّي.. بحّار</span>
       <span class="line">لو أحدٌ يمنحني زورق..</span>
       <span class="line accent">أرسيتُ قلوعي كلَّ مساء</span>
       <span class="line refrain">في مرفأ عينيكِ الأزرق..</span>
+    </div>
+    <div class="verse en-content">
+      <span class="line">If only, if only I were a sailor,</span>
+      <span class="line">If only somebody'd give me a boat,</span>
+      <span class="line accent">I would furl my sails each evening</span>
+      <span class="line refrain">In the blue harbor of your eyes.</span>
     </div>
   </div>
 
 </section>
 
 <footer class="footer">
-  <div class="signature">— نزار قبّاني</div>
-  <div class="meta">شاعر الحبّ · دمشق</div>
+  <div class="signature ar-content">— نزار قبّاني</div>
+  <div class="signature en-content"><em>— Nizar Qabbani</em></div>
+  <div class="meta ar-content">شاعر الحبّ · دمشق</div>
+  <div class="meta en-content">Poet of Love · Damascus</div>
 </footer>
 
 <script>
@@ -849,7 +1051,7 @@
   });
 
   // cursor grows on interactive elements
-  document.querySelectorAll('.line, .sound-toggle').forEach(el => {
+  document.querySelectorAll('.line, .sound-toggle, .lang-toggle button').forEach(el => {
     el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
     el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
   });
@@ -1015,6 +1217,45 @@
       soundBtn.classList.remove('playing');
       playing = false;
     }
+  });
+
+  // ============ LANGUAGE TOGGLE ============
+  const langToggle = document.getElementById('langToggle');
+  const langButtons = langToggle.querySelectorAll('button');
+  const html = document.documentElement;
+  const body = document.body;
+
+  langButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const lang = btn.dataset.lang;
+      const currentLang = body.classList.contains('en-mode') ? 'en' : 'ar';
+      if (lang === currentLang) return;
+
+      // fade out → switch → fade in
+      body.classList.add('switching');
+
+      setTimeout(() => {
+        if (lang === 'en') {
+          body.classList.add('en-mode');
+          html.setAttribute('lang', 'en');
+          html.setAttribute('dir', 'ltr');
+          langToggle.classList.remove('ar');
+          langToggle.classList.add('en');
+        } else {
+          body.classList.remove('en-mode');
+          html.setAttribute('lang', 'ar');
+          html.setAttribute('dir', 'rtl');
+          langToggle.classList.remove('en');
+          langToggle.classList.add('ar');
+        }
+
+        // update active button state
+        langButtons.forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+
+        // fade back in
+        setTimeout(() => body.classList.remove('switching'), 50);
+      }, 300);
+    });
   });
 </script>
 
