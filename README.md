@@ -1,7 +1,7 @@
 # Arabic Poetry — Interactive Collection
 
 An interactive collection of Arabic poetry with bilingual (AR/EN) support, atmospheric visuals, and ambient effects.
-
+SideNot: eclient prototypes for his restaurant projector
 ---
 
 ## Poems
