@@ -596,9 +596,6 @@ body {
 }
 
 /* ============ LANGUAGE VISIBILITY ============ */
-body.lang-ar .en-content { display: none; }
-body.lang-en .ar-content { display: none; }
-body.lang-en { direction: ltr; }
 body.lang-en .verse { direction: ltr; text-align: left; }
 
 /* ============ RESPONSIVE ============ */

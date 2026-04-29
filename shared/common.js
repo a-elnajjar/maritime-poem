@@ -57,23 +57,38 @@
   if (langToggle) {
     const langButtons = langToggle.querySelectorAll('button');
 
-    langButtons.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const lang = btn.dataset.lang;
-        langButtons.forEach((b) => b.classList.remove('active'));
-        btn.classList.add('active');
-        langToggle.classList.remove('ar', 'en');
-        langToggle.classList.add(lang);
+    function setLangClasses(lang) {
+      document.body.classList.remove('lang-ar', 'lang-en');
+      document.body.classList.add('lang-' + lang);
+      document.documentElement.lang = lang;
+      document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    }
 
+    function applyLang(lang, animate) {
+      langButtons.forEach((b) => b.classList.toggle('active', b.dataset.lang === lang));
+      langToggle.classList.remove('ar', 'en');
+      langToggle.classList.add(lang);
+      localStorage.setItem('preferredLang', lang);
+
+      if (animate) {
         document.body.classList.add('switching');
         setTimeout(() => {
-          document.body.classList.remove('lang-ar', 'lang-en');
-          document.body.classList.add('lang-' + lang);
-          document.documentElement.lang = lang;
-          document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+          setLangClasses(lang);
           setTimeout(() => document.body.classList.remove('switching'), 50);
         }, 300);
-      });
+      } else {
+        setLangClasses(lang);
+      }
+    }
+
+    // Restore saved language preference without animation
+    const savedLang = localStorage.getItem('preferredLang');
+    if (savedLang && savedLang !== 'ar') {
+      applyLang(savedLang, false);
+    }
+
+    langButtons.forEach((btn) => {
+      btn.addEventListener('click', () => applyLang(btn.dataset.lang, true));
     });
   }
 })();
