@@ -189,34 +189,13 @@ if (ornament) {
 // Each character tumbles in with spring bounce easing
 const titleEl = document.querySelector('.title');
 if (titleEl) {
-  const arSpan = titleEl.querySelector('.ar-content');
-  if (arSpan) {
-    arSpan.style.opacity = '0';
-    animate(arSpan, { opacity: [0, 1], y: [65, 0] }, {
-      duration: 0.85,
-      delay: 0.55,
-      easing: [0.34, 1.56, 0.64, 1],
-    });
-  }
-
-  titleEl.querySelectorAll('span:not(.ar-content)').forEach(span => {
-    const text = span.textContent;
-    span.textContent = '';
-    [...text].forEach(char => {
-      const s = document.createElement('span');
-      s.className = 'title-char';
-      s.textContent = char === ' ' ? ' ' : char;
-      span.appendChild(s);
-    });
+  const spans = titleEl.querySelectorAll('span');
+  spans.forEach(s => { s.style.opacity = '0'; });
+  animate(spans, { opacity: [0, 1], y: [65, 0] }, {
+    duration: 0.85,
+    delay: 0.55,
+    easing: [0.34, 1.56, 0.64, 1],
   });
-  const chars = titleEl.querySelectorAll('.title-char');
-  if (chars.length) {
-    animate(chars, { opacity: [0, 1], y: [65, 0], rotateZ: [-22, 0] }, {
-      duration: 0.65,
-      delay: stagger(0.058, { start: 0.55 }),
-      easing: [0.34, 1.56, 0.64, 1],
-    });
-  }
 }
 
 // ─── 4. Eyebrow + Byline Fade-Up Sequence ────────────
@@ -280,7 +259,7 @@ inView('.stanza.opening', () => {
 
 // ─── 8. Stanza Scroll Reveals (non-final) — 3D Spring ─
 inView('.stanza:not(.final)', ({ target }) => {
-  animate(target, { opacity: [0, 1], y: [55, 0], rotateX: [9, 0] }, {
+  animate(target, { opacity: [0, 1], y: [55, 0] }, {
     duration: 0.9,
     easing: [0.25, 0.46, 0.45, 0.94],
   });
